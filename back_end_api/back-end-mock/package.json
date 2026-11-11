@@ -1,0 +1,17 @@
+{
+  "name": "back-end-mock",
+  "version": "1.0.0",
+  "description": "后台 Mock 数据服务（访问日志 / 折线图 / 用户 / 品牌）",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^2.5.0"
+  }
+}

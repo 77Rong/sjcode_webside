@@ -1,0 +1,770 @@
+{
+  "accessLogs": [
+    {
+      "id": 1794362123116,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-11T01:55:23.116Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1794361276634,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-11T01:41:16.634Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OpenCode/2.2.6 Chrome/152.0.7977.167 Electron/44.9.1 Safari/537.36"
+    },
+    {
+      "id": 1794361218592,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-11T01:40:18.592Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OpenCode/2.2.6 Chrome/152.0.7977.167 Electron/44.9.1 Safari/537.36"
+    },
+    {
+      "id": 1794361209769,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-11T01:40:09.769Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OpenCode/2.2.6 Chrome/152.0.7977.167 Electron/44.9.1 Safari/537.36"
+    },
+    {
+      "id": 1794361184660,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-11T01:39:44.660Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OpenCode/2.2.6 Chrome/152.0.7977.167 Electron/44.9.1 Safari/537.36"
+    },
+    {
+      "id": 1794319685913,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-10T14:08:05.913Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1794301070883,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-10T08:57:50.883Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1794232235398,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-09T13:50:35.398Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1794212437761,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-09T08:20:37.761Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1794212023351,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-11-09T08:13:43.351Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.7.1036"
+    },
+    {
+      "id": 1793146810385,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-28T00:20:10.385Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.2.1020"
+    },
+    {
+      "id": 1793146800934,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-28T00:20:00.934Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"
+    },
+    {
+      "id": 1793101664936,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-27T11:47:44.937Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.2.1020"
+    },
+    {
+      "id": 1793101659949,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-27T11:47:39.949Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.2.1020"
+    },
+    {
+      "id": 1793101655682,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-27T11:47:35.682Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 QuarkPC/7.4.2.1020"
+    },
+    {
+      "id": 1793032913591,
+      "ip": "127.0.0.1",
+      "region": "上海市",
+      "time": "2026-10-26T16:41:53.591Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"
+    },
+    {
+      "id": 1793007919442,
+      "ip": "192.168.1.11",
+      "region": "广州市",
+      "time": "2026-10-22T23:39:34.296Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007918442,
+      "ip": "10.0.0.2",
+      "region": "北京市",
+      "time": "2026-10-21T01:25:21.292Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007917442,
+      "ip": "172.16.0.5",
+      "region": "南京市",
+      "time": "2026-10-23T01:16:21.306Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007916442,
+      "ip": "58.213.123.45",
+      "region": "西安市",
+      "time": "2026-10-26T00:15:54.489Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007915442,
+      "ip": "192.168.1.11",
+      "region": "上海市",
+      "time": "2026-10-24T13:29:28.201Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007914442,
+      "ip": "36.22.55.7",
+      "region": "青岛市",
+      "time": "2026-10-22T01:02:22.972Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007913442,
+      "ip": "114.88.66.21",
+      "region": "重庆市",
+      "time": "2026-10-21T15:41:19.884Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007912442,
+      "ip": "10.0.0.2",
+      "region": "武汉市",
+      "time": "2026-10-20T01:11:47.075Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007911442,
+      "ip": "222.94.140.9",
+      "region": "天津市",
+      "time": "2026-10-23T15:28:53.294Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007910442,
+      "ip": "172.16.0.5",
+      "region": "深圳市",
+      "time": "2026-10-19T18:25:13.605Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007909442,
+      "ip": "58.213.123.45",
+      "region": "深圳市",
+      "time": "2026-10-22T09:56:09.624Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007908442,
+      "ip": "172.16.0.5",
+      "region": "北京市",
+      "time": "2026-10-23T21:11:52.497Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007907442,
+      "ip": "127.0.0.1",
+      "region": "成都市",
+      "time": "2026-10-22T19:01:44.320Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007906442,
+      "ip": "10.0.0.2",
+      "region": "天津市",
+      "time": "2026-10-23T08:11:06.202Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007905442,
+      "ip": "222.94.140.9",
+      "region": "重庆市",
+      "time": "2026-10-24T11:27:18.128Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007904442,
+      "ip": "58.213.123.45",
+      "region": "郑州市",
+      "time": "2026-10-19T16:38:42.570Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007903442,
+      "ip": "192.168.1.11",
+      "region": "杭州市",
+      "time": "2026-10-21T11:27:36.061Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007902442,
+      "ip": "10.0.0.2",
+      "region": "广州市",
+      "time": "2026-10-23T08:52:26.066Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007901442,
+      "ip": "10.0.0.3",
+      "region": "苏州市",
+      "time": "2026-10-19T18:34:45.191Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007900442,
+      "ip": "10.0.0.3",
+      "region": "北京市",
+      "time": "2026-10-25T13:58:18.980Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007899442,
+      "ip": "222.94.140.9",
+      "region": "杭州市",
+      "time": "2026-10-22T11:44:40.790Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007898442,
+      "ip": "10.0.0.3",
+      "region": "重庆市",
+      "time": "2026-10-24T02:07:39.157Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007897442,
+      "ip": "222.94.140.9",
+      "region": "郑州市",
+      "time": "2026-10-22T09:25:42.856Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007896442,
+      "ip": "172.16.0.5",
+      "region": "上海市",
+      "time": "2026-10-24T17:05:00.165Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007895442,
+      "ip": "172.16.0.5",
+      "region": "西安市",
+      "time": "2026-10-26T08:01:26.683Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007894442,
+      "ip": "222.94.140.9",
+      "region": "北京市",
+      "time": "2026-10-23T15:36:53.813Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007893442,
+      "ip": "192.168.1.11",
+      "region": "郑州市",
+      "time": "2026-10-23T16:15:31.897Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007892442,
+      "ip": "10.0.0.3",
+      "region": "西安市",
+      "time": "2026-10-24T11:55:19.570Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007891442,
+      "ip": "222.94.140.9",
+      "region": "西安市",
+      "time": "2026-10-25T14:13:24.005Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007890442,
+      "ip": "192.168.1.10",
+      "region": "青岛市",
+      "time": "2026-10-20T17:32:47.536Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007889442,
+      "ip": "36.22.55.7",
+      "region": "深圳市",
+      "time": "2026-10-22T04:51:48.013Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007888442,
+      "ip": "36.22.55.7",
+      "region": "武汉市",
+      "time": "2026-10-26T05:28:47.851Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007887442,
+      "ip": "10.0.0.3",
+      "region": "杭州市",
+      "time": "2026-10-23T00:20:10.176Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007886442,
+      "ip": "10.0.0.3",
+      "region": "长沙市",
+      "time": "2026-10-23T00:24:40.357Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007885442,
+      "ip": "10.0.0.2",
+      "region": "苏州市",
+      "time": "2026-10-23T09:46:24.912Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007884442,
+      "ip": "127.0.0.1",
+      "region": "重庆市",
+      "time": "2026-10-23T15:09:21.714Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007883442,
+      "ip": "222.94.140.9",
+      "region": "深圳市",
+      "time": "2026-10-25T14:55:58.758Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007882442,
+      "ip": "114.88.66.21",
+      "region": "天津市",
+      "time": "2026-10-20T12:49:08.372Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007881442,
+      "ip": "114.88.66.21",
+      "region": "深圳市",
+      "time": "2026-10-20T02:39:54.695Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007880442,
+      "ip": "222.94.140.9",
+      "region": "苏州市",
+      "time": "2026-10-25T12:45:01.033Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007879442,
+      "ip": "114.88.66.21",
+      "region": "苏州市",
+      "time": "2026-10-21T08:24:19.527Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007878442,
+      "ip": "58.213.123.45",
+      "region": "上海市",
+      "time": "2026-10-19T10:09:34.160Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007877442,
+      "ip": "127.0.0.1",
+      "region": "深圳市",
+      "time": "2026-10-21T06:51:08.546Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007876442,
+      "ip": "58.213.123.45",
+      "region": "武汉市",
+      "time": "2026-10-25T19:06:31.418Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007875442,
+      "ip": "127.0.0.1",
+      "region": "广州市",
+      "time": "2026-10-22T00:21:56.752Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007874442,
+      "ip": "36.22.55.7",
+      "region": "广州市",
+      "time": "2026-10-23T19:08:06.800Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007873442,
+      "ip": "192.168.1.11",
+      "region": "上海市",
+      "time": "2026-10-26T00:57:06.838Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007872442,
+      "ip": "172.16.0.5",
+      "region": "重庆市",
+      "time": "2026-10-25T18:43:37.286Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007871442,
+      "ip": "127.0.0.1",
+      "region": "天津市",
+      "time": "2026-10-26T04:59:54.613Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007870442,
+      "ip": "172.16.0.5",
+      "region": "青岛市",
+      "time": "2026-10-22T19:52:32.705Z",
+      "path": "/products",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007869442,
+      "ip": "114.88.66.21",
+      "region": "武汉市",
+      "time": "2026-10-23T19:23:00.813Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007868442,
+      "ip": "58.213.123.45",
+      "region": "重庆市",
+      "time": "2026-10-25T23:21:46.270Z",
+      "path": "/about",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007867442,
+      "ip": "127.0.0.1",
+      "region": "南京市",
+      "time": "2026-10-23T11:09:47.744Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007866442,
+      "ip": "58.213.123.45",
+      "region": "西安市",
+      "time": "2026-10-23T03:46:21.757Z",
+      "path": "/contact",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007865442,
+      "ip": "58.213.123.45",
+      "region": "杭州市",
+      "time": "2026-10-23T07:51:57.741Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007864442,
+      "ip": "10.0.0.3",
+      "region": "武汉市",
+      "time": "2026-10-23T20:52:05.943Z",
+      "path": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007863442,
+      "ip": "10.0.0.3",
+      "region": "郑州市",
+      "time": "2026-10-25T02:17:31.560Z",
+      "path": "/news",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    },
+    {
+      "id": 1793007862442,
+      "ip": "172.16.0.5",
+      "region": "苏州市",
+      "time": "2026-10-20T22:31:25.819Z",
+      "path": "/services",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007861442,
+      "ip": "114.88.66.21",
+      "region": "重庆市",
+      "time": "2026-10-22T16:52:53.004Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    },
+    {
+      "id": 1793007860442,
+      "ip": "58.213.123.45",
+      "region": "杭州市",
+      "time": "2026-10-24T16:07:07.257Z",
+      "path": "/help",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+  ],
+  "brands": [
+    {
+      "id": 1,
+      "name": "校园通",
+      "logo": "",
+      "copyright": "© 2026 校园通教育科技有限公司",
+      "icp": "京ICP备 20260001 号",
+      "enabled": true,
+      "createTime": "2026-01-08 09:30:00",
+      "updateTime": "2026-10-27 14:03:57"
+    },
+    {
+      "id": 2,
+      "name": "云教务",
+      "logo": "",
+      "copyright": "© 2026 云教务 All Rights Reserved",
+      "icp": "京ICP备 20260002 号",
+      "enabled": true,
+      "createTime": "2026-02-15 14:20:00",
+      "updateTime": "2026-02-15 14:20:00"
+    },
+    {
+      "id": 3,
+      "name": "云校招",
+      "logo": "",
+      "copyright": "© 2026 云校招",
+      "icp": "京ICP备 20260003 号",
+      "enabled": false,
+      "createTime": "2026-03-22 11:05:00",
+      "updateTime": "2026-10-27 11:04:07"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "userName": "admin",
+      "nickName": "超级管理员",
+      "userGender": "男",
+      "userPhone": "13800138000",
+      "userEmail": "admin@example.com",
+      "userRoles": [
+        "R_SUPER"
+      ],
+      "status": "1",
+      "createBy": "system",
+      "createTime": "2025-01-01 09:00:00",
+      "updateBy": "admin",
+      "updateTime": "2026-10-26 12:59:13",
+      "password": "abc123"
+    },
+    {
+      "id": 2,
+      "userName": "editor",
+      "nickName": "内容编辑",
+      "userGender": "女",
+      "userPhone": "13800138001",
+      "userEmail": "editor@example.com",
+      "userRoles": [
+        "R_ADMIN"
+      ],
+      "status": "1",
+      "createBy": "admin",
+      "createTime": "2025-01-05 14:20:00",
+      "updateBy": "admin",
+      "updateTime": "2026-10-26 12:59:13"
+    },
+    {
+      "id": 3,
+      "userName": "viewer",
+      "nickName": "访客",
+      "userGender": "男",
+      "userPhone": "13800138002",
+      "userEmail": "viewer@example.com",
+      "userRoles": [],
+      "status": "2",
+      "createBy": "admin",
+      "createTime": "2025-01-08 11:11:00",
+      "updateBy": "admin",
+      "updateTime": "2025-01-08 11:11:00"
+    },
+    {
+      "id": 4,
+      "userName": "zhangsan",
+      "nickName": "张三",
+      "userGender": "男",
+      "userPhone": "13905718888",
+      "userEmail": "zhangsan@example.com",
+      "userRoles": [
+        "R_ADMIN"
+      ],
+      "status": "1",
+      "createBy": "admin",
+      "createTime": "2025-02-11 09:30:00",
+      "updateBy": "admin",
+      "updateTime": "2026-10-26 15:23:29",
+      "password": "abc12345"
+    },
+    {
+      "id": 5,
+      "userName": "lisi",
+      "nickName": "李四",
+      "userGender": "女",
+      "userPhone": "13705719999",
+      "userEmail": "lisi@example.com",
+      "userRoles": [
+        "R_ADMIN"
+      ],
+      "status": "1",
+      "createBy": "admin",
+      "createTime": "2025-03-02 16:45:00",
+      "updateBy": "admin",
+      "updateTime": "2025-03-02 16:45:00"
+    },
+    {
+      "id": 6,
+      "userName": "wangwu",
+      "nickName": "王五",
+      "userGender": "男",
+      "userPhone": "13605712222",
+      "userEmail": "wangwu@example.com",
+      "userRoles": [],
+      "status": "2",
+      "createBy": "zhangsan",
+      "createTime": "2025-04-18 10:05:00",
+      "updateBy": "zhangsan",
+      "updateTime": "2025-04-18 10:05:00"
+    },
+    {
+      "id": 7,
+      "userName": "sunqi",
+      "nickName": "孙七",
+      "userGender": "女",
+      "userPhone": "13505713333",
+      "userEmail": "sunqi@example.com",
+      "userRoles": [
+        "R_ADMIN"
+      ],
+      "status": "1",
+      "createBy": "admin",
+      "createTime": "2025-05-22 13:20:00",
+      "updateBy": "admin",
+      "updateTime": "2025-05-22 13:20:00"
+    },
+    {
+      "id": 8,
+      "userName": "zhouba",
+      "nickName": "周八",
+      "userGender": "男",
+      "userPhone": "13405714444",
+      "userEmail": "zhouba@example.com",
+      "userRoles": [],
+      "status": "4",
+      "createBy": "admin",
+      "createTime": "2025-06-30 08:00:00",
+      "updateBy": "admin",
+      "updateTime": "2025-06-30 08:00:00"
+    }
+  ]
+}

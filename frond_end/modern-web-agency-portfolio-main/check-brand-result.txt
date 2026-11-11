@@ -1,0 +1,5 @@
+status 200 len 110764
+SSR html has 校园通: true
+SSR html has 京ICP备: true
+active brand -> {"id":1,"name":"校园通","logo":"","copyright":"© 2026 校园通教育科技有限公司","icp":"京ICP备 20260001 号","enabled":true,"createTime":"2026-01-08 09:30:00","updateTime":"2026-01-08 09:30:00"}
+enabled brands -> ["校园通","云教务"]
