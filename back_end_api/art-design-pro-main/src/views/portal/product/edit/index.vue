@@ -11,13 +11,13 @@
         </div>
         <div class="header-actions">
           <ElButton @click="onBack">返回</ElButton>
-          <ElButton type="primary" @click="onSave">保存</ElButton>
+          <ElButton type="primary" :loading="saving" @click="onSave">保存</ElButton>
         </div>
       </div>
     </ElCard>
 
     <ElCard shadow="never" class="form-card">
-      <ElForm :model="formData" label-width="100px" class="meta-form">
+      <ElForm v-loading="loading" :model="formData" label-width="100px" class="meta-form">
         <ElFormItem label="产品名称">
           <ElInput v-model="formData.name" placeholder="请输入产品名称" />
         </ElFormItem>
@@ -43,6 +43,11 @@
             v-model="formData.content"
             :height="'520px'"
             placeholder="请输入产品正本内容（支持图文混排、表格、代码块等）..."
+            :upload-config="{
+              isCustomUpload: true,
+              server: '/api/common/upload/wangeditor',
+              maxFileSize: 5 * 1024 * 1024
+            }"
           />
         </ElFormItem>
       </ElForm>
@@ -52,20 +57,16 @@
 
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { computed, reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import {
+  fetchCreateProduct,
+  fetchGetProduct,
+  fetchUpdateProduct,
+  type ProductItem
+} from '@/api/product'
 
 defineOptions({ name: 'PortalProductEdit' })
-
-/** 模拟后端返回的产品详情 */
-interface ProductDetail {
-  id: number
-  name: string
-  subTitle: string
-  category: string
-  /** 产品正本内容（HTML 字符串） */
-  content: string
-}
 
 const CATEGORY_OPTIONS = [
   { value: '教育', label: '教育' },
@@ -73,34 +74,6 @@ const CATEGORY_OPTIONS = [
   { value: '管理', label: '管理' },
   { value: '其它', label: '其它' }
 ]
-
-/** 模拟后端持久化的产品数据，与产品列表共享同样的 3 条记录 */
-const MOCK_PRODUCTS: Record<number, ProductDetail> = {
-  1: {
-    id: 1,
-    name: '智慧校园管理平台',
-    subTitle: '校园一体化数字管理',
-    category: '教育',
-    content:
-      '<h2>产品介绍</h2><p>面向您的全场景业务的一体化平台。</p><p>覆盖教学、学工、办公全场景。</p><h3>核心功能</h3><ul><li>智能排课</li><li>在线考务</li><li>成绩分析</li></ul>'
-  },
-  2: {
-    id: 2,
-    name: '企业官网定制',
-    subTitle: '高端定制企业官网',
-    category: '建站',
-    content:
-      '<h2>服务介绍</h2><p>为企业量身打造品牌官网，响应式设计 + 私域运营。</p>'
-  },
-  3: {
-    id: 3,
-    name: '教务管理系统',
-    subTitle: '排课 / 考务 / 成绩',
-    category: '教育',
-    content:
-      '<h2>系统简介</h2><p>教务核心系统，支持智能排课、在线考务与成绩分析。</p>'
-  }
-}
 
 const route = useRoute()
 const router = useRouter()
@@ -113,50 +86,82 @@ const id = computed<number | null>(() => {
   return Number.isFinite(n) ? n : null
 })
 
-const formData = reactive<ProductDetail>({
+const formData = reactive<Partial<ProductItem>>({
   id: 0,
   name: '',
   subTitle: '',
   category: '教育',
+  summary: '',
   content: ''
 })
 
-/** 初始化：从 mock 后端拉取对应 id 的产品正本 */
-const initFromRoute = () => {
-  if (id.value !== null && MOCK_PRODUCTS[id.value]) {
-    const src = MOCK_PRODUCTS[id.value]
-    Object.assign(formData, src)
-  } else {
-    formData.id = id.value ?? 0
+const loading = ref(false)
+const saving = ref(false)
+
+/** 初始化：从后端拉取对应 id 的产品正本 */
+const initFromRoute = async () => {
+  if (id.value === null) {
+    formData.id = 0
     formData.name = ''
     formData.subTitle = ''
     formData.category = '教育'
+    formData.summary = ''
     formData.content = '<p></p>'
+    return
+  }
+  loading.value = true
+  try {
+    const item = await fetchGetProduct(id.value)
+    Object.assign(formData, item)
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  } finally {
+    loading.value = false
   }
 }
-initFromRoute()
 
 const pageTitle = computed(() =>
   id.value !== null ? '产品正文编辑' : '新增产品正本'
 )
+
+onMounted(() => {
+  initFromRoute()
+})
 
 const onBack = () => {
   router.push('/portal/products')
 }
 
 const onSave = async () => {
-  if (!formData.name.trim()) {
+  if (!formData.name?.trim()) {
     ElMessage.warning('请填写产品名称')
     return
-  }
-  if (!formData.content.trim() || formData.content === '<p></p>') {
+  }  if (!formData.content?.trim() || formData.content === '<p></p>') {
     ElMessage.warning('正文内容不能为空')
     return
   }
-  // 这里对接实际接口
-  MOCK_PRODUCTS[formData.id || Date.now()] = { ...formData }
-  ElMessage.success('产品正本已保存')
-  router.push('/portal/products')
+  saving.value = true
+  try {
+    const payload = {
+      name: formData.name.trim(),
+      subTitle: formData.subTitle || '',
+      category: formData.category || '其它',
+      summary: formData.summary || '',
+      content: formData.content
+    }
+    if (id.value !== null) {
+      await fetchUpdateProduct(id.value, payload)
+      ElMessage.success('产品正本已保存')
+    } else {
+      await fetchCreateProduct(payload)
+      ElMessage.success('产品正本已创建')
+    }
+    router.push('/portal/products')
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 

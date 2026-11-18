@@ -21,6 +21,11 @@ export const BUCKET_NAME = 'hero-images'
 /** 对应的数据库表名 */
 export const HERO_TABLE = 'hero_slides'
 
+/** 存放富文本编辑器上传图片的公开存储桶名 */
+export const EDITOR_BUCKET = 'editor-images'
+/** 产品管理对应的数据库表名 */
+export const PRODUCT_TABLE = 'products'
+
 export const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_KEY)
 
 export const supabase = supabaseConfigured
@@ -28,21 +33,34 @@ export const supabase = supabaseConfigured
   : null
 
 /** 存储桶是否已确认存在（避免每次上传都查询） */
-let bucketReady = false
+const BUCKET_READY = {}
 
 /** 首次上传前确保存储桶存在（不存在则创建公开桶） */
-export async function ensureHeroBucket() {
-  if (!supabase || bucketReady) return
-  const { data } = await supabase.storage.getBucket(BUCKET_NAME)
+async function ensureBucket(name) {
+  if (!supabase) return
+  const { data } = await supabase.storage.getBucket(name)
   if (!data) {
-    const { error } = await supabase.storage.createBucket(BUCKET_NAME, { public: true })
+    const { error } = await supabase.storage.createBucket(name, { public: true })
     if (error) {
       const msg = String(error.message || '').toLowerCase()
       // 桶已存在（并发/残留）时忽略，其他错误抛出
       if (!msg.includes('exist') && !msg.includes('duplicate')) throw error
     }
   }
-  bucketReady = true
+}
+
+/** 首次上传前确保焦点图存储桶存在 */
+export async function ensureHeroBucket() {
+  if (!supabase || BUCKET_READY[BUCKET_NAME]) return
+  await ensureBucket(BUCKET_NAME)
+  BUCKET_READY[BUCKET_NAME] = true
+}
+
+/** 首次上传前确保编辑器图片存储桶存在 */
+export async function ensureEditorBucket() {
+  if (!supabase || BUCKET_READY[EDITOR_BUCKET]) return
+  await ensureBucket(EDITOR_BUCKET)
+  BUCKET_READY[EDITOR_BUCKET] = true
 }
 
 /** 数据库行（snake_case）→ API 字段（camelCase） */
@@ -82,9 +100,43 @@ export function toHeroRow(body = {}) {
 }
 
 /** 从图片公开 URL 中解析出存储对象路径（用于删除旧图） */
-export function extractStoragePath(imageUrl) {
-  const marker = `/storage/v1/object/public/${BUCKET_NAME}/`
+export function extractStoragePath(imageUrl, bucket = BUCKET_NAME) {
+  const marker = `/storage/v1/object/public/${bucket}/`
   const idx = String(imageUrl || '').indexOf(marker)
   if (idx < 0) return null
   return decodeURIComponent(String(imageUrl).slice(idx + marker.length).split('?')[0])
+}
+
+/** 产品表：数据库行（snake_case）→ API 字段（camelCase） */
+export function toProductApi(row = {}) {
+  return {
+    id: row.id,
+    name: row.name ?? '',
+    subTitle: row.sub_title ?? '',
+    category: row.category ?? '其它',
+    summary: row.summary ?? '',
+    content: row.content ?? '',
+    enabled: row.enabled ?? true,
+    sortOrder: row.sort_order ?? 0,
+    createTime: row.created_at ? String(row.created_at).replace('T', ' ').slice(0, 19) : '',
+    updateTime: row.updated_at ? String(row.updated_at).replace('T', ' ').slice(0, 19) : ''
+  }
+}
+
+/** 产品表：API 字段（camelCase）→ 数据库列（snake_case），只保留请求中传入的字段 */
+export function toProductRow(body = {}) {
+  const map = {
+    name: 'name',
+    subTitle: 'sub_title',
+    category: 'category',
+    summary: 'summary',
+    content: 'content',
+    enabled: 'enabled',
+    sortOrder: 'sort_order'
+  }
+  const row = {}
+  for (const [key, column] of Object.entries(map)) {
+    if (body[key] !== undefined) row[column] = body[key]
+  }
+  return row
 }

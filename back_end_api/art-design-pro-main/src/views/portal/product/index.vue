@@ -12,45 +12,60 @@ import {
   Search,
   SortUp
 } from '@element-plus/icons-vue'
-import { computed, reactive, ref } from 'vue'
-import { storeToRefs } from 'pinia'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { PRODUCT_CATEGORY_OPTIONS, usePortalStore } from '@/store/modules/portal'
 import {
-  PRODUCT_CATEGORY_OPTIONS,
-  usePortalStore,
-  type PortalProduct
-} from '@/store/modules/portal'
+  fetchCreateProduct,
+  fetchDeleteProduct,
+  fetchGetProductList,
+  fetchUpdateProduct,
+  type ProductItem
+} from '@/api/product'
 
 defineOptions({ name: 'PortalProduct' })
-
-/** 产品数据模型见 store/modules/portal */
-type ProductItem = PortalProduct
 
 const portalStore = usePortalStore()
 
 /** 产品分类下拉选项（来自 store） */
 const CATEGORY_OPTIONS = PRODUCT_CATEGORY_OPTIONS
 
-/** 产品列表：直接读写 store，作为全局唯一数据源 */
-const { products: tableData } = storeToRefs(portalStore)
-
 const loading = ref(false)
 const searchKeyword = ref('')
 const categoryFilter = ref<string>('')
+const tableData = ref<ProductItem[]>([])
 
-/** 搜索 + 分类过滤后的列表 */
-const filteredData = computed(() => {
-  const kw = searchKeyword.value.trim()
-  return tableData.value.filter((p) => {
-    const matchKw = !kw || p.name.includes(kw) || p.subTitle.includes(kw) || p.summary.includes(kw)
-    const matchCategory = !categoryFilter.value || p.category === categoryFilter.value
-    return matchKw && matchCategory
-  })
-})
+/** 拉取产品列表（关键词 + 分类过滤由后端完成） */
+const loadList = async () => {
+  loading.value = true
+  try {
+    const list = await fetchGetProductList({
+      keyword: searchKeyword.value.trim(),
+      category: categoryFilter.value || undefined
+    })
+    tableData.value = list || []
+    // 同步到 portal store，供「帮助文档管理」等页面的产品下拉使用
+    portalStore.setProducts(
+      tableData.value.map((p) => ({
+        id: p.id,
+        name: p.name,
+        subTitle: p.subTitle,
+        category: p.category,
+        summary: p.summary,
+        content: p.content
+      }))
+    )
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  } finally {
+    loading.value = false
+  }
+}
 
 /** -------- 新增 / 编辑弹窗 -------- */
 const dialogVisible = ref(false)
 const dialogMode = ref<'add' | 'edit'>('add')
+const saving = ref(false)
 const formData = reactive<Partial<ProductItem>>({})
 
 const resetForm = () => {
@@ -74,7 +89,7 @@ const onEdit = (row: ProductItem) => {
   dialogVisible.value = true
 }
 
-const onSave = () => {
+const onSave = async () => {
   if (!formData.name?.trim()) {
     ElMessage.warning('请输入产品名称')
     return
@@ -83,31 +98,40 @@ const onSave = () => {
     ElMessage.warning('请选择产品分类')
     return
   }
-  if (dialogMode.value === 'add') {
-    const newId = portalStore.nextProductId()
-    tableData.value.unshift({
-      id: newId,
-      name: formData.name!,
+  saving.value = true
+  try {
+    const payload = {
+      name: formData.name.trim(),
       subTitle: formData.subTitle || '',
-      category: formData.category!,
+      category: formData.category,
       summary: formData.summary || '',
       content: formData.content || ''
-    })
-    ElMessage.success('新增产品成功')
-  } else {
-    const idx = tableData.value.findIndex((p) => p.id === formData.id)
-    if (idx >= 0) {
-      tableData.value[idx] = { ...tableData.value[idx], ...(formData as ProductItem) }
+    }
+    if (dialogMode.value === 'add') {
+      await fetchCreateProduct(payload)
+      ElMessage.success('新增产品成功')
+    } else if (formData.id) {
+      await fetchUpdateProduct(formData.id, payload)
       ElMessage.success('产品已更新')
     }
+    dialogVisible.value = false
+    await loadList()
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  } finally {
+    saving.value = false
   }
-  dialogVisible.value = false
 }
 
 const onDelete = async (row: ProductItem) => {
   await ElMessageBox.confirm(`确定删除产品「${row.name}」？`, '提示', { type: 'warning' })
-  tableData.value = tableData.value.filter((p) => p.id !== row.id)
-  ElMessage.success('已删除')
+  try {
+    await fetchDeleteProduct(row.id)
+    ElMessage.success('已删除')
+    await loadList()
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  }
 }
 
 const router = useRouter()
@@ -125,26 +149,22 @@ const onManage = (cmd: string, row: ProductItem) => {
 }
 
 const onSearch = () => {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    ElMessage.success(
-      searchKeyword.value ? `搜索「${searchKeyword.value}」完成` : '已刷新列表'
-    )
-  }, 300)
+  loadList()
 }
 
 const onRefresh = () => {
-  searchKeyword.value = ''
-  categoryFilter.value = ''
-  onSearch()
+  loadList()
 }
 
 const onReset = () => {
   searchKeyword.value = ''
   categoryFilter.value = ''
-  ElMessage.info('已重置搜索条件')
+  loadList()
 }
+
+onMounted(() => {
+  loadList()
+})
 </script>
 
 <template>
@@ -212,7 +232,7 @@ const onReset = () => {
 
       <ElTable
         v-loading="loading"
-        :data="filteredData"
+        :data="tableData"
         row-key="id"
         border
         stripe
@@ -311,7 +331,7 @@ const onReset = () => {
       </ElForm>
       <template #footer>
         <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="onSave">保存</ElButton>
+        <ElButton type="primary" :loading="saving" @click="onSave">保存</ElButton>
       </template>
     </ElDialog>
   </div>

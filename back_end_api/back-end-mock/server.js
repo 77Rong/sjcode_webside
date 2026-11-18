@@ -15,6 +15,12 @@
  *   DELETE /api/brand/:id       -> 删除品牌
  *   GET  /api/users             -> 用户列表
  *
+ * 联系我们（前台留言表单 -> 后台联系管理）：
+ *   POST   /api/contact         -> 提交留言（前台「联系我们」表单调用）
+ *   GET    /api/contact/list    -> 留言列表（后台管理，分页 + 关键词 + 状态过滤）
+ *   PUT    /api/contact/:id     -> 更新留言（处理状态）
+ *   DELETE /api/contact/:id     -> 删除留言
+ *
  * 首页焦点图（数据与图片存储在 Supabase，凭证见 .env）：
  *   GET    /api/hero/list        -> 焦点图列表（后台管理，关键词 + 启用过滤）
  *   GET    /api/hero/active      -> 启用中的焦点图（前台轮播使用，按 sort_order 排序）
@@ -23,7 +29,7 @@
  *   DELETE /api/hero/:id         -> 删除焦点图（同时清理存储对象）
  *   POST   /api/hero/:id/image   -> 上传/替换图片（multipart form-data，存 Supabase Storage）
  *
- * 本地数据（品牌 / 用户 / 访问日志）持久化到 ./data.json
+ * 本地数据（品牌 / 用户 / 访问日志 / 留言）持久化到 ./data.json
  */
 import express from 'express'
 import cors from 'cors'
@@ -35,12 +41,24 @@ import {
   supabase,
   supabaseConfigured,
   ensureHeroBucket,
+  ensureEditorBucket,
   toHeroApi,
   toHeroRow,
+  toProductApi,
+  toProductRow,
   extractStoragePath,
   BUCKET_NAME,
-  HERO_TABLE
+  EDITOR_BUCKET,
+  HERO_TABLE,
+  PRODUCT_TABLE
 } from './supabase.js'
+import {
+  ensureContactTable,
+  listContacts,
+  createContact,
+  updateContact,
+  deleteContact
+} from './contact-store.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -86,6 +104,16 @@ function loadData() {
           }
         ]
         delete data.brand
+      }
+      // 兼容旧版留言结构（无 status 字段），补齐处理状态
+      if (!Array.isArray(data.contacts)) {
+        data.contacts = []
+      } else {
+        data.contacts = data.contacts.map((c) => ({
+          ...c,
+          status: c.status || 'pending',
+          reply: c.reply || ''
+        }))
       }
       return data
     } catch (e) {
@@ -300,7 +328,40 @@ function initSeed() {
     }
   ]
 
-  return { accessLogs, brands, users }
+  const contacts = [
+    {
+      id: 1,
+      name: '张同学',
+      email: 'zhang@example.com',
+      phone: '13812341234',
+      message: '想咨询产品定制流程',
+      status: 'pending',
+      reply: '',
+      createdAt: '2026-09-28 14:25:31'
+    },
+    {
+      id: 2,
+      name: '王老师',
+      email: 'wang@example.com',
+      phone: '13987655678',
+      message: '希望上门演示系统',
+      status: 'processed',
+      reply: '已电话联系，安排下周演示',
+      createdAt: '2026-09-29 09:42:18'
+    },
+    {
+      id: 3,
+      name: '刘总',
+      email: 'liu@example.com',
+      phone: '13678909012',
+      message: '需要商务合作',
+      status: 'pending',
+      reply: '',
+      createdAt: '2026-09-30 11:08:55'
+    }
+  ]
+
+  return { accessLogs, brands, users, contacts }
 }
 
 const db = loadData()
@@ -481,6 +542,175 @@ app.delete('/api/brand/:id', (req, res) => {
   const idx = db.brands.findIndex((b) => b.id === id)
   if (idx < 0) return res.json(fail('品牌不存在'))
   db.brands.splice(idx, 1)
+  saveData(db)
+  res.json(ok({ ok: true }))
+})
+
+// ----------------- 联系我们留言 -----------------
+
+/** 电话脱敏：13812341234 -> 138****1234 */
+function maskPhone(phone) {
+  const str = String(phone || '')
+  if (str.length < 7) return str
+  return `${str.slice(0, 3)}****${str.slice(-4)}`
+}
+
+/** 留言记录 -> API 字段（列表用脱敏电话，详情用原始电话） */
+function toContactApi(row = {}) {
+  return {
+    id: row.id,
+    name: row.name ?? '',
+    email: row.email ?? '',
+    phone: maskPhone(row.phone),
+    rawPhone: row.phone ?? '',
+    message: row.message ?? '',
+    status: row.status || 'pending',
+    reply: row.reply ?? '',
+    createdAt: row.createdAt ?? ''
+  }
+}
+
+// 前台提交留言
+app.post('/api/contact', async (req, res) => {
+  const { name, email, phone, message } = req.body || {}
+  if (!name || !String(name).trim()) return res.json(fail('姓名不能为空'))
+  if (!email || !String(email).trim()) return res.json(fail('邮箱不能为空'))
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
+    return res.json(fail('邮箱格式不正确'))
+  }
+  if (!phone || !String(phone).trim()) return res.json(fail('电话不能为空'))
+  if (!message || !String(message).trim()) return res.json(fail('留言内容不能为空'))
+
+  const payload = {
+    name: String(name).trim(),
+    email: String(email).trim(),
+    phone: String(phone).trim(),
+    message: String(message).trim(),
+    status: 'pending',
+    reply: ''
+  }
+
+  // Supabase 表可用时直接入库
+  if (await ensureContactTable()) {
+    try {
+      const created = await createContact(payload)
+      return res.json(ok(toContactApi(created)))
+    } catch (err) {
+      console.error('[contact] 写入 Supabase 失败：', err.message)
+      return res.json(fail('提交失败，请稍后重试'))
+    }
+  }
+
+  // 回退：data.json
+  const now = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  const item = {
+    id: Math.max(0, ...db.contacts.map((c) => c.id)) + 1,
+    ...payload,
+    createdAt:
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+  }
+  db.contacts.unshift(item)
+  saveData(db)
+  res.json(ok(toContactApi(item)))
+})
+
+// 后台列表：分页 + 关键词 + 处理状态过滤
+app.get('/api/contact/list', async (req, res) => {
+  const { current = 1, size = 10, keyword = '', status = '' } = req.query
+
+  if (await ensureContactTable()) {
+    try {
+      const result = await listContacts({ current, size, keyword, status })
+      return res.json(
+        ok({
+          records: result.records.map(toContactApi),
+          current: result.current,
+          size: result.size,
+          total: result.total
+        })
+      )
+    } catch (err) {
+      console.error('[contact] 读取 Supabase 失败：', err.message)
+      return res.json(fail('读取留言失败，请稍后重试'))
+    }
+  }
+
+  let list = db.contacts.slice()
+
+  if (keyword) {
+    const kw = String(keyword).trim().toLowerCase()
+    list = list.filter(
+      (c) =>
+        String(c.name).toLowerCase().includes(kw) ||
+        String(c.email).toLowerCase().includes(kw) ||
+        String(c.phone).includes(kw) ||
+        String(c.message).toLowerCase().includes(kw)
+    )
+  }
+  if (status && status !== 'all') {
+    list = list.filter((c) => (c.status || 'pending') === String(status))
+  }
+
+  const total = list.length
+  const start = (Number(current) - 1) * Number(size)
+  const records = list.slice(start, start + Number(size)).map(toContactApi)
+
+  res.json(ok({ records, current: Number(current), size: Number(size), total }))
+})
+
+// 更新留言（处理状态 / 备注）
+app.put('/api/contact/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { status, reply } = req.body || {}
+  if (status !== undefined && !['pending', 'processed'].includes(String(status))) {
+    return res.json(fail('处理状态不合法'))
+  }
+
+  const patch = {}
+  if (status !== undefined) patch.status = String(status)
+  if (reply !== undefined) patch.reply = String(reply)
+
+  if (await ensureContactTable()) {
+    try {
+      const updated = await updateContact(id, patch)
+      return res.json(ok(toContactApi(updated)))
+    } catch (err) {
+      console.error('[contact] 更新 Supabase 失败：', err.message)
+      return res.json(fail('留言不存在或更新失败'))
+    }
+  }
+
+  const idx = db.contacts.findIndex((c) => c.id === id)
+  if (idx < 0) return res.json(fail('留言不存在'))
+
+  db.contacts[idx] = {
+    ...db.contacts[idx],
+    status: status !== undefined ? String(status) : db.contacts[idx].status || 'pending',
+    reply: reply !== undefined ? String(reply) : db.contacts[idx].reply || ''
+  }
+  saveData(db)
+  res.json(ok(toContactApi(db.contacts[idx])))
+})
+
+// 删除留言
+app.delete('/api/contact/:id', async (req, res) => {
+  const id = Number(req.params.id)
+
+  if (await ensureContactTable()) {
+    try {
+      await deleteContact(id)
+      return res.json(ok({ ok: true }))
+    } catch (err) {
+      console.error('[contact] 删除 Supabase 失败：', err.message)
+      return res.json(fail('留言不存在或删除失败'))
+    }
+  }
+
+  const idx = db.contacts.findIndex((c) => c.id === id)
+  if (idx < 0) return res.json(fail('留言不存在'))
+  db.contacts.splice(idx, 1)
   saveData(db)
   res.json(ok({ ok: true }))
 })
@@ -801,9 +1031,141 @@ app.post('/api/hero/:id/image', heroUpload.single('file'), async (req, res) => {
   res.json(ok(toHeroApi(data)))
 })
 
+// ----------------- 产品管理（Supabase：products 表 + editor-images 存储桶） -----------------
+
+// 列表（后台管理）：关键词搜索 + 分类 / 启用状态过滤
+app.get('/api/product/list', async (req, res) => {
+  if (!requireSupabase(res)) return
+  const { keyword = '', category, enabled } = req.query
+
+  let query = supabase.from(PRODUCT_TABLE).select('*').order('sort_order').order('id')
+  if (keyword) {
+    query = query.or(`name.ilike.%${keyword}%,sub_title.ilike.%${keyword}%,summary.ilike.%${keyword}%`)
+  }
+  if (category && category !== 'all') {
+    query = query.eq('category', category)
+  }
+  if (enabled !== undefined && enabled !== '' && enabled !== 'all') {
+    query = query.eq('enabled', enabled === 'true' || enabled === '1')
+  }
+
+  const { data, error } = await query
+  if (error) return res.json(fail(`读取产品列表失败：${error.message}`, 500))
+  res.json(ok((data || []).map(toProductApi)))
+})
+
+// 前台站点使用：启用中的产品，按 sort_order 升序
+app.get('/api/product/active', async (_req, res) => {
+  if (!requireSupabase(res)) return
+  const { data, error } = await supabase
+    .from(PRODUCT_TABLE)
+    .select('*')
+    .eq('enabled', true)
+    .order('sort_order')
+    .order('id')
+  if (error) return res.json(fail(`读取产品列表失败：${error.message}`, 500))
+  res.json(ok((data || []).map(toProductApi)))
+})
+
+// 产品详情（后台「正本编辑」页使用）
+app.get('/api/product/:id', async (req, res) => {
+  if (!requireSupabase(res)) return
+  const id = Number(req.params.id)
+  const { data, error } = await supabase.from(PRODUCT_TABLE).select('*').eq('id', id).single()
+  if (error || !data) return res.json(fail('产品不存在'))
+  res.json(ok(toProductApi(data)))
+})
+
+// 新增产品
+app.post('/api/product', async (req, res) => {
+  if (!requireSupabase(res)) return
+  const body = req.body || {}
+  if (!body.name || !String(body.name).trim()) return res.json(fail('产品名称不能为空'))
+
+  const row = toProductRow(body)
+  const { data, error } = await supabase.from(PRODUCT_TABLE).insert(row).select().single()
+  if (error) return res.json(fail(`新增产品失败：${error.message}`, 500))
+  res.json(ok(toProductApi(data)))
+})
+
+// 更新产品（支持任意字段的局部更新）
+app.put('/api/product/:id', async (req, res) => {
+  if (!requireSupabase(res)) return
+  const id = Number(req.params.id)
+  const row = toProductRow(req.body || {})
+  if (!Object.keys(row).length) return res.json(fail('没有需要更新的字段'))
+
+  const { data, error } = await supabase.from(PRODUCT_TABLE).update(row).eq('id', id).select().single()
+  if (error) return res.json(fail(`更新产品失败：${error.message}`, 500))
+  if (!data) return res.json(fail('产品不存在'))
+  res.json(ok(toProductApi(data)))
+})
+
+// 删除产品
+app.delete('/api/product/:id', async (req, res) => {
+  if (!requireSupabase(res)) return
+  const id = Number(req.params.id)
+
+  const { data: existing, error: e1 } = await supabase.from(PRODUCT_TABLE).select('*').eq('id', id).single()
+  if (e1 || !existing) return res.json(fail('产品不存在'))
+
+  const { error } = await supabase.from(PRODUCT_TABLE).delete().eq('id', id)
+  if (error) return res.json(fail(`删除产品失败：${error.message}`, 500))
+
+  // 尽力清理正文中引用的本桶图片（解析 content 里的 URL 逐个删除，失败不影响结果）
+  const urls = String(existing.content || '').match(
+    new RegExp(String.raw`https:\/\/[^"'()\s]+\/storage\/v1\/object\/public\/${EDITOR_BUCKET}\/[^"'()\s]+`, 'g')
+  )
+  const paths = [...new Set((urls || []).map((u) => extractStoragePath(u, EDITOR_BUCKET)).filter(Boolean))]
+  if (paths.length) {
+    try {
+      await supabase.storage.from(EDITOR_BUCKET).remove(paths)
+    } catch {
+      // 清理失败不影响删除结果
+    }
+  }
+  res.json(ok(toProductApi(existing)))
+})
+
+// 富文本编辑器图片上传（multipart/form-data，字段名 file）
+// 存入公开桶 editor-images，返回 { url, alt, href } 供 WangEditor 插图
+const editorUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^image\//.test(file.mimetype)) cb(null, true)
+    else cb(new Error('只能上传图片文件'))
+  }
+})
+
+app.post('/api/common/upload/wangeditor', editorUpload.single('file'), async (req, res) => {
+  if (!requireSupabase(res)) return
+  if (!req.file) return res.json(fail('请选择要上传的图片文件'))
+
+  try {
+    await ensureEditorBucket()
+  } catch (err) {
+    return res.json(fail(`初始化存储桶失败：${err.message}`, 500))
+  }
+
+  const ext =
+    (String(req.file.originalname).split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') ||
+    'png'
+  const objectPath = `editor-${Date.now()}-${Math.round(Math.random() * 1e6)}.${ext}`
+
+  const { error: upErr } = await supabase.storage
+    .from(EDITOR_BUCKET)
+    .upload(objectPath, req.file.buffer, { contentType: req.file.mimetype, upsert: false })
+  if (upErr) return res.json(fail(`图片上传失败：${upErr.message}`, 500))
+
+  const { data: pub } = supabase.storage.from(EDITOR_BUCKET).getPublicUrl(objectPath)
+  const publicUrl = pub?.publicUrl || ''
+  res.json(ok({ url: publicUrl, alt: req.file.originalname || '', href: '' }))
+})
+
 // ----------------- 根路径 -----------------
 app.get('/', (_req, res) => {
-  res.json({ service: 'back-end-mock', port: PORT, endpoints: ['/api/dashboard/visits', '/api/access-logs', '/api/access-log', '/api/brand/list', '/api/brand/active', '/api/users'] })
+  res.json({ service: 'back-end-mock', port: PORT, endpoints: ['/api/dashboard/visits', '/api/access-logs', '/api/access-log', '/api/brand/list', '/api/brand/active', '/api/users', '/api/contact', '/api/contact/list'] })
 })
 
 app.listen(PORT, '0.0.0.0', () => {

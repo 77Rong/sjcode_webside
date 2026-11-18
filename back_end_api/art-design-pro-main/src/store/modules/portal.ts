@@ -62,6 +62,11 @@ export const usePortalStore = defineStore('portalStore', () => {
   /** 产品列表 */
   const products = ref<PortalProduct[]>(INITIAL_PRODUCTS)
 
+  /** 用后端返回的产品列表覆盖本地 mock（产品管理页加载后调用） */
+  const setProducts = (list: PortalProduct[]) => {
+    if (Array.isArray(list)) products.value = list
+  }
+
   /** 产品下拉选项：供「帮助文档管理」等产品名称字段选择 */
   const productOptions = computed(() =>
     products.value.map((p) => ({ value: p.name, label: p.name }))
@@ -76,5 +81,5 @@ export const usePortalStore = defineStore('portalStore', () => {
   /** 生成下一个可用 id */
   const nextProductId = () => Math.max(0, ...products.value.map((p) => p.id)) + 1
 
-  return { products, productOptions, getProductByName, getProductById, nextProductId }
+  return { products, productOptions, getProductByName, getProductById, nextProductId, setProducts }
 })
