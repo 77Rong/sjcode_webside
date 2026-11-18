@@ -3,9 +3,13 @@
  *
  * 数据实际存储在 Supabase（hero_slides 表），由后端转发；
  * Mock 服务地址可用环境变量覆盖：NEXT_PUBLIC_MOCK_API_BASE
+ *
+ * 默认走同源相对路径，由 next.config.js 的 rewrites 转发到 back-end-mock。
+ * 页面可能通过内网穿透地址访问，此时浏览器里的 localhost 不是本机，
+ * 绝对地址会导致请求失败。
  */
 
-const MOCK_API_BASE = process.env.NEXT_PUBLIC_MOCK_API_BASE || 'http://localhost:3100';
+import { apiBase } from './api-base';
 
 export interface HeroSlide {
   /** 记录 ID */
@@ -77,7 +81,7 @@ function normalizeSlide(raw: Record<string, unknown>, index: number): HeroSlide 
 
 /** 获取启用中的首页焦点图（后台管理的实时数据，按 sort_order 排序） */
 export async function fetchHeroSlides(): Promise<HeroSlide[]> {
-  const res = await fetch(`${MOCK_API_BASE}/api/hero/active`, {
+  const res = await fetch(`${apiBase()}/api/hero/active`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',

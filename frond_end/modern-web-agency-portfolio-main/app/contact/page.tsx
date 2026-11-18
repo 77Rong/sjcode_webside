@@ -19,6 +19,7 @@ import { Mail, Phone, MapPin, Send, MessageSquare, Clock, CheckCircle2 } from 'l
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState } from 'react';
+import { fetchSubmitContact } from '@/lib/contact-api';
 
 const formSchema = z.object({
   name: z.string().min(2, '姓名至少需要 2 个字符'),
@@ -49,6 +50,8 @@ const faqItems = [
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,12 +62,21 @@ export default function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Simulate form submission
-    setTimeout(() => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      const result = await fetchSubmitContact(values);
+      if (!result.ok) {
+        setSubmitError(result.msg || '提交失败，请稍后重试');
+        return;
+      }
       setIsSubmitted(true);
-    }, 1000);
+    } catch {
+      setSubmitError('留言服务暂时不可用，请稍后重试');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -257,8 +269,13 @@ export default function Contact() {
                           )}
                         />
 
-                        <Button type="submit" className="w-full">
-                          <Send className="mr-2 h-4 w-4" /> 发送留言
+                        {submitError && (
+                          <p className="text-sm text-destructive">{submitError}</p>
+                        )}
+
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                          <Send className="mr-2 h-4 w-4" />
+                          {isSubmitting ? '发送中...' : '发送留言'}
                         </Button>
                       </form>
                     </Form>

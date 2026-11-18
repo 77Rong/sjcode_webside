@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Refresh, Search } from '@element-plus/icons-vue'
-import { computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import {
+  fetchDeleteContact,
+  fetchGetContactList,
+  fetchUpdateContact,
+  type ContactItem
+} from '@/api/contact'
 
 defineOptions({ name: 'PortalContact' })
 
 /**
- * 联系表单提交记录数据模型
+ * 联系表单提交记录（来源：前台「联系我们」表单，经后端 /api/contact 落库）
  *
- * 字段名与前台「联系我们」表单保持一致：
- * app/contact/page.tsx -> formSchema
+ * 字段名与前台 formSchema 一致：
  *   name     姓名
  *   email    邮箱
  *   phone    电话（列表脱敏展示，详情展示原始值）
@@ -17,85 +22,84 @@ defineOptions({ name: 'PortalContact' })
  *
  * 后台额外字段：
  *   rawPhone  电话原始值
+ *   status    处理状态 pending 未处理 / processed 已处理
+ *   reply     处理备注
  *   createdAt 提交时间
  */
-interface ContactItem {
-  id: number
-  name: string
-  email: string
-  phone: string
-  rawPhone: string
-  message: string
-  createdAt: string
-}
+const STATUS_CONFIG = {
+  pending: { type: 'warning' as const, text: '未处理' },
+  processed: { type: 'success' as const, text: '已处理' }
+} as const
 
-const tableData = ref<ContactItem[]>([
-  {
-    id: 1,
-    name: '张同学',
-    email: 'zhang@example.com',
-    rawPhone: '13812341234',
-    phone: '138****1234',
-    message: '想咨询产品定制流程',
-    createdAt: '2026-09-28 14:25:31'
-  },
-  {
-    id: 2,
-    name: '王老师',
-    email: 'wang@example.com',
-    rawPhone: '13987655678',
-    phone: '139****5678',
-    message: '希望上门演示系统',
-    createdAt: '2026-09-29 09:42:18'
-  },
-  {
-    id: 3,
-    name: '刘总',
-    email: 'liu@example.com',
-    rawPhone: '13678909012',
-    phone: '136****9012',
-    message: '需要商务合作',
-    createdAt: '2026-09-30 11:08:55'
-  }
-])
-
+const tableData = ref<ContactItem[]>([])
+const total = ref(0)
+const current = ref(1)
+const size = ref(10)
 const loading = ref(false)
 const searchKeyword = ref('')
+const statusFilter = ref<'all' | 'pending' | 'processed'>('all')
+
 const detailVisible = ref(false)
 const detailRow = ref<ContactItem | null>(null)
 
-/** 搜索过滤后的列表 */
-const filteredData = computed(() => {
-  const kw = searchKeyword.value.trim()
-  if (!kw) return tableData.value
-  return tableData.value.filter(
-    (c) =>
-      c.name.includes(kw) ||
-      c.email.includes(kw) ||
-      c.phone.includes(kw) ||
-      c.message.includes(kw)
-  )
+/** 拉取留言列表（服务端分页 + 关键词 + 状态过滤） */
+const loadList = async () => {
+  loading.value = true
+  try {
+    const data = await fetchGetContactList({
+      current: current.value,
+      size: size.value,
+      keyword: searchKeyword.value.trim(),
+      status: statusFilter.value
+    })
+    tableData.value = data.records
+    total.value = data.total
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  void loadList()
 })
 
 /** -------- 搜索 / 刷新 / 重置 -------- */
 const onSearch = () => {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    ElMessage.success(
-      searchKeyword.value ? `搜索「${searchKeyword.value}」完成` : '已刷新列表'
-    )
-  }, 300)
+  current.value = 1
+  void loadList()
 }
 
 const onRefresh = () => {
   searchKeyword.value = ''
-  onSearch()
+  statusFilter.value = 'all'
+  current.value = 1
+  void loadList()
 }
 
 const onReset = () => {
   searchKeyword.value = ''
-  ElMessage.info('已重置搜索条件')
+  statusFilter.value = 'all'
+  current.value = 1
+  void loadList()
+}
+
+const onStatusChange = () => {
+  current.value = 1
+  void loadList()
+}
+
+/** -------- 分页 -------- */
+const onCurrentChange = (val: number) => {
+  current.value = val
+  void loadList()
+}
+
+const onSizeChange = (val: number) => {
+  size.value = val
+  current.value = 1
+  void loadList()
 }
 
 /** -------- 查看详情 -------- */
@@ -104,13 +108,34 @@ const onView = (row: ContactItem) => {
   detailVisible.value = true
 }
 
+/** -------- 标记处理状态 -------- */
+const onToggleStatus = async (row: ContactItem) => {
+  const next = row.status === 'processed' ? 'pending' : 'processed'
+  try {
+    await fetchUpdateContact(row.id, { status: next })
+    ElMessage.success(next === 'processed' ? '已标记为已处理' : '已标记为未处理')
+    await loadList()
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  }
+}
+
 /** -------- 删除 -------- */
 const onDelete = async (row: ContactItem) => {
   await ElMessageBox.confirm(`确定删除「${row.name}」的提交记录？`, '提示', {
     type: 'warning'
   })
-  tableData.value = tableData.value.filter((c) => c.id !== row.id)
-  ElMessage.success('已删除')
+  try {
+    await fetchDeleteContact(row.id)
+    ElMessage.success('已删除')
+    // 删除当前页最后一条时回退一页
+    if (tableData.value.length === 1 && current.value > 1) {
+      current.value -= 1
+    }
+    await loadList()
+  } catch {
+    // 错误提示已由 http 封装统一弹出
+  }
 }
 </script>
 
@@ -141,6 +166,11 @@ const onDelete = async (row: ContactItem) => {
           :prefix-icon="Search"
           @keyup.enter="onSearch"
         />
+        <ElSelect v-model="statusFilter" class="status-select" @change="onStatusChange">
+          <ElOption value="all" label="全部状态" />
+          <ElOption value="pending" label="未处理" />
+          <ElOption value="processed" label="已处理" />
+        </ElSelect>
         <ElButton @click="onReset">重置</ElButton>
         <ElButton type="primary" @click="onSearch">查询</ElButton>
       </div>
@@ -149,7 +179,7 @@ const onDelete = async (row: ContactItem) => {
     <ElCard shadow="never" class="table-card">
       <ElTable
         v-loading="loading"
-        :data="filteredData"
+        :data="tableData"
         row-key="id"
         border
         stripe
@@ -160,39 +190,45 @@ const onDelete = async (row: ContactItem) => {
         <ElTableColumn prop="email" label="邮箱" min-width="200" align="center" />
         <ElTableColumn prop="phone" label="电话" min-width="140" align="center" />
         <ElTableColumn prop="message" label="留言内容" min-width="220" />
-        <ElTableColumn
-          prop="createdAt"
-          label="提交时间"
-          width="180"
-          align="center"
-        />
-        <ElTableColumn label="操作" width="160" fixed="right" align="center">
+        <ElTableColumn label="状态" width="100" align="center">
+          <template #default="{ row }">
+            <ElTag :type="STATUS_CONFIG[row.status as 'pending' | 'processed'].type">
+              {{ STATUS_CONFIG[row.status as 'pending' | 'processed'].text }}
+            </ElTag>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn prop="createdAt" label="提交时间" width="180" align="center" />
+        <ElTableColumn label="操作" width="230" fixed="right" align="center">
           <template #default="{ row }">
             <ElButton link type="primary" @click="onView(row)">查看</ElButton>
+            <ElButton
+              link
+              type="warning"
+              @click="onToggleStatus(row)"
+            >
+              {{ row.status === 'processed' ? '标记未处理' : '标记已处理' }}
+            </ElButton>
             <ElButton link type="danger" @click="onDelete(row)">删除</ElButton>
           </template>
         </ElTableColumn>
       </ElTable>
 
       <div class="pagination-row">
-        <span class="total-text">共 {{ filteredData.length }} 条</span>
+        <span class="total-text">共 {{ total }} 条</span>
         <ElPagination
           background
           layout="prev, pager, next"
-          :total="filteredData.length"
-          :page-size="10"
+          :total="total"
+          :current-page="current"
+          :page-size="size"
           :hide-on-single-page="true"
+          @current-change="onCurrentChange"
         />
-        <ElSelect class="page-size-select" :model-value="10">
+        <ElSelect class="page-size-select" :model-value="size" @change="onSizeChange">
           <ElOption :value="10" label="10条/页" />
           <ElOption :value="20" label="20条/页" />
           <ElOption :value="50" label="50条/页" />
         </ElSelect>
-        <span class="jump-text">
-          前往
-          <ElInput class="jump-input" :model-value="1" />
-          页
-        </span>
       </div>
     </ElCard>
 
@@ -208,6 +244,14 @@ const onDelete = async (row: ContactItem) => {
         <ElDescriptionsItem label="邮箱">{{ detailRow.email }}</ElDescriptionsItem>
         <ElDescriptionsItem label="电话">{{ detailRow.rawPhone }}</ElDescriptionsItem>
         <ElDescriptionsItem label="留言内容">{{ detailRow.message }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="处理状态">
+          <ElTag :type="STATUS_CONFIG[detailRow.status as 'pending' | 'processed'].type">
+            {{ STATUS_CONFIG[detailRow.status as 'pending' | 'processed'].text }}
+          </ElTag>
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="处理备注">
+          {{ detailRow.reply || '—' }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem label="提交时间">{{ detailRow.createdAt }}</ElDescriptionsItem>
       </ElDescriptions>
       <template #footer>
@@ -266,6 +310,10 @@ const onDelete = async (row: ContactItem) => {
       width: 320px;
       max-width: 100%;
     }
+
+    .status-select {
+      width: 130px;
+    }
   }
 
   .table-card {
@@ -285,18 +333,6 @@ const onDelete = async (row: ContactItem) => {
 
     .page-size-select {
       width: 110px;
-    }
-
-    .jump-text {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      color: #4b5563;
-
-      .jump-input {
-        width: 60px;
-      }
     }
   }
 }

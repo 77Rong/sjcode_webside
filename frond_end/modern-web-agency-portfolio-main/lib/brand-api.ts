@@ -2,9 +2,13 @@
  * 前台站点品牌配置接口（对接 back-end-mock 的 /api/brand/active）
  *
  * Mock 服务地址可用环境变量覆盖：NEXT_PUBLIC_MOCK_API_BASE
+ *
+ * 默认走同源相对路径，由 next.config.js 的 rewrites 转发到 back-end-mock。
+ * 页面可能通过内网穿透地址访问，此时浏览器里的 localhost 不是本机，
+ * 绝对地址会导致请求失败。
  */
 
-const MOCK_API_BASE = process.env.NEXT_PUBLIC_MOCK_API_BASE || 'http://localhost:3100';
+import { apiBase } from './api-base';
 
 export interface BrandConfig {
   /** 品牌 ID */
@@ -32,7 +36,7 @@ export const DEFAULT_BRAND: BrandConfig = {
 
 /** 获取站点品牌配置（后台启用的品牌，多个时取第一个） */
 export async function fetchBrandConfig(): Promise<BrandConfig> {
-  const res = await fetch(`${MOCK_API_BASE}/api/brand/active`, {
+  const res = await fetch(`${apiBase()}/api/brand/active`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
@@ -73,7 +77,7 @@ export async function reportAccessLog(payload: {
   timezone?: string;
   userAgent?: string;
 }): Promise<void> {
-  await fetch(`${MOCK_API_BASE}/api/access-log`, {
+  await fetch(`${apiBase()}/api/access-log`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

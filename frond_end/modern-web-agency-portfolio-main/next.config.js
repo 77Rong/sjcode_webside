@@ -24,6 +24,18 @@ const nextConfig = {
   },
   // 关闭右下角 N 浮标（按需求）
   devIndicators: false,
+  // 同源代理：把 /api/* 转发到 back-end-mock（3100）。
+  // 浏览器可能通过内网穿透地址访问本站，此时页面里的 localhost:3100
+  // 指向的不是本机，留言提交会静默失败。改走同源相对路径即可避免该问题。
+  async rewrites() {
+    const target = process.env.BACKEND_API_ORIGIN || 'http://localhost:3100';
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${target}/api/:path*`,
+      },
+    ];
+  },
   // 关键修复：默认 prefetch 是 null，
   // Trae IDE 内嵌预览面板或某些 dev 工具在加载页面时偶尔会中断首屏请求，
   // 表现为 net::ERR_ABORTED。

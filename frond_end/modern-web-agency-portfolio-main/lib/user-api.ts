@@ -2,9 +2,13 @@
  * 前台用户相关接口（对接 back-end-mock 的 /api/user）
  *
  * Mock 服务地址可用环境变量覆盖：NEXT_PUBLIC_MOCK_API_BASE
+ *
+ * 默认走同源相对路径，由 next.config.js 的 rewrites 转发到 back-end-mock。
+ * 页面可能通过内网穿透地址访问，此时浏览器里的 localhost 不是本机，
+ * 绝对地址会导致请求失败。
  */
 
-const MOCK_API_BASE = process.env.NEXT_PUBLIC_MOCK_API_BASE || 'http://localhost:3100';
+import { apiBase } from './api-base';
 
 export interface RemoteDuplicateState {
   userNameExists: boolean;
@@ -30,7 +34,7 @@ export async function fetchUserDuplicateState(params: {
   if (params.userName) query.set('userName', params.userName);
   if (params.userEmail) query.set('userEmail', params.userEmail);
 
-  const res = await fetch(`${MOCK_API_BASE}/api/user/check?${query.toString()}`, {
+  const res = await fetch(`${apiBase()}/api/user/check?${query.toString()}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -45,7 +49,7 @@ export async function fetchUserDuplicateState(params: {
 
 /** 注册新用户，写入后台用户列表 */
 export async function fetchCreateUser(payload: CreateUserPayload): Promise<{ ok: boolean; msg?: string }> {
-  const res = await fetch(`${MOCK_API_BASE}/api/user`, {
+  const res = await fetch(`${apiBase()}/api/user`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
